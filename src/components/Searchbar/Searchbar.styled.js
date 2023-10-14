@@ -20,9 +20,11 @@ export const SearchForm = styled(Form)`
   position: relative;
   width: 100%;
   max-width: 400px;
+  height: 60%;
 `;
 
 export const Input = styled(Field)`
+  height: 100%;
   width: 100%;
   border: 3px solid #433f3f;
   outline: none;
@@ -35,7 +37,7 @@ export const Input = styled(Field)`
 `;
 
 export const SubmitBtn = styled.button`
-  top: 30%;
+  top: 32%;
   left: 10px;
   position: absolute;
   width: 40px;

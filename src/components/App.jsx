@@ -25,46 +25,56 @@ export default class App extends Component {
     }
   }
 
+  getFirstImages = async () => {
+    const { query, page } = this.state;
+    this.setState({ loading: true, page: 1 })
+
+    try {
+      const res = await getImageByQuery(query, 1);
+      if (res.hits.length === 0) {
+      throw new Error('Sorry, there are no images matching your search query.')
+      }
+        
+      this.setState({
+        images: res.hits.map(this.buildImageObj),
+        showLoadMore: page < Number(res.totalHits) / 12 
+      })
+        
+      toast.success(`Hooray! We found ${res.totalHits} images!`)
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      this.setState({ loading: false })
+    }
+  }
+
+  getOtherImages = async () => {
+    const { query, page } = this.state;
+    this.setState({ loading: true })
+
+    try {
+      const res = await getImageByQuery(query, page);
+
+      this.setState(prevState => ({
+        images: [...prevState.images, ...res.hits.map(this.buildImageObj)],
+        showLoadMore: page < Number(res.totalHits) / 12 
+      }))
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      this.setState({ loading: false })
+    }
+  }
+
   async componentDidUpdate(_, prevState) {
     const { query, page, loading } = this.state;
 
     if (prevState.query !== query) {
-      this.setState({ loading: true, page: 1 })
-
-      try {
-        const res = await getImageByQuery(query, 1);
-         if (res.hits.length === 0) {
-           throw new Error('Sorry, there are no images matching your search query.')
-        }
-        
-        this.setState({
-          images: res.hits.map(this.buildImageObj),
-          showLoadMore: page < Number(res.totalHits) / 12 
-        })
-
-        toast.success(`Hooray! We found ${res.totalHits} images!`)
-      } catch (error) {
-        toast.error(error.message);
-      } finally {
-        this.setState({ loading: false })
-      }
+      this.getFirstImages();
     }
 
     if (prevState.query === query && prevState.page !== page && !loading) {
-      this.setState({ loading: true })
-
-      try {
-        const res = await getImageByQuery(query, page);
-
-        this.setState(prevState => ({
-          images: [...prevState.images, ...res.hits.map(this.buildImageObj)],
-          showLoadMore: page < Number(res.totalHits) / 12 
-        }))
-      } catch (error) {
-        toast.error(error.message);
-      } finally {
-        this.setState({ loading: false })
-      }
+      this.getOtherImages();
     }
   }
 
