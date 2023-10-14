@@ -6,7 +6,7 @@ export const SearchForm = styled(Form)`
   gap: 20px;
   justify-content: center;
   align-items: center;
-  height: 100px;
+  height: 80px;
   width: 100%;
   position: fixed;
   z-index: 100;

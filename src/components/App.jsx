@@ -23,16 +23,15 @@ export default class App extends Component {
   }
 
   async componentDidUpdate(_, prevState) {
-    const { query, page } = this.state;
+    const { query, page, loading } = this.state;
 
     if (prevState.query !== query) {
-      this.setState({ loading: true })
+      this.setState({ loading: true, page: 1 })
 
       try {
         const res = await getImageByQuery(query, 1);
         this.setState({
           images: res.hits.map(this.buildImageObj),
-          page: 1
         })
       } catch (error) {
         this.setState({ error })
@@ -41,7 +40,7 @@ export default class App extends Component {
       }
     }
 
-    if (prevState.query === query && prevState.page !== page) {
+    if (prevState.query === query && prevState.page !== page && !loading) {
       this.setState({ loading: true })
 
       try {
@@ -63,7 +62,6 @@ export default class App extends Component {
 
   onLoadMore = () => {
     this.setState(prevState => ({ page: prevState.page + 1 }));
-
   }
 
   render() {
