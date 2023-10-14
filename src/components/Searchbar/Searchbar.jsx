@@ -1,7 +1,15 @@
 import { Formik } from "formik";
 import { SearchForm, Input, SubmitBtn } from "./Searchbar.styled";
+import * as Yup from 'yup';
 import { BsSearch } from 'react-icons/bs'
 import { Header } from "./Searchbar.styled";
+
+const ContactSchema = Yup.object().shape({
+  query: Yup.string()
+      .trim()
+      .min(1, 'Too short contact name!')
+      .required('Required')
+ });
 
 export const Searchbar = ({onSubmit}) => {
   const onSubmitForm = (values, helpers) => {
@@ -14,9 +22,10 @@ export const Searchbar = ({onSubmit}) => {
       <Formik 
         initialValues={{ query: ''}}
         onSubmit={onSubmitForm}
+        validationSchema={ContactSchema}
       >
         <SearchForm>
-          <SubmitBtn type="submit" onClick={onSubmit}>
+          <SubmitBtn type="submit">
             <BsSearch />
           </SubmitBtn>
 
