@@ -1,5 +1,7 @@
-import { Formik, Field } from "formik";
+import { Formik } from "formik";
 import { SearchForm, Input, SubmitBtn } from "./Searchbar.styled";
+import { BsSearch } from 'react-icons/bs'
+import { Header } from "./Searchbar.styled";
 
 export const Searchbar = ({onSubmit}) => {
   const onSubmitForm = (values, helpers) => {
@@ -8,14 +10,14 @@ export const Searchbar = ({onSubmit}) => {
   }
 
   return (
-    <header>
+    <Header>
       <Formik 
         initialValues={{ query: ''}}
         onSubmit={onSubmitForm}
       >
         <SearchForm>
           <SubmitBtn type="submit" onClick={onSubmit}>
-            <span >Search</span>
+            <BsSearch />
           </SubmitBtn>
 
           <Input
@@ -26,6 +28,6 @@ export const Searchbar = ({onSubmit}) => {
             />
         </SearchForm>
       </Formik>
-    </header>
+    </Header>
   );
 }

@@ -6,7 +6,7 @@ export const Gallery = styled.ul`
   align-items: center;
   gap: 15px;
   flex-wrap: wrap;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   list-style: none;
 `;
 
