@@ -2,6 +2,10 @@ import { createGlobalStyle } from "styled-components"
 import 'modern-normalize';
 
 export const GlobalStyle = createGlobalStyle`
+  html,body {
+    scroll-behavior: smooth
+  }
+
   html {
     box-sizing: border-box;
     width: 100vw;

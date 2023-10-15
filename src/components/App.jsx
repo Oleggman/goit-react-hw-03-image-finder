@@ -25,65 +25,48 @@ export default class App extends Component {
     }
   }
 
-  getFirstImages = async () => {
-    const { query, page } = this.state;
-    this.setState({ loading: true, page: 1 })
-
-    try {
-      const res = await getImageByQuery(query, 1);
-      if (res.hits.length === 0) {
-      throw new Error('Sorry, there are no images matching your search query.')
-      }
-        
-      this.setState({
-        images: res.hits.map(this.buildImageObj),
-        showLoadMore: page < Number(res.totalHits) / 12 
-      })
-        
-      toast.success(`Hooray! We found ${res.totalHits} images!`)
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      this.setState({ loading: false })
-    }
-  }
-
-  getOtherImages = async () => {
-    const { query, page } = this.state;
-    this.setState({ loading: true })
-
-    try {
-      const res = await getImageByQuery(query, page);
-
-      this.setState(prevState => ({
-        images: [...prevState.images, ...res.hits.map(this.buildImageObj)],
-        showLoadMore: page < Number(res.totalHits) / 12 
-      }))
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      this.setState({ loading: false })
-    }
-  }
-
   async componentDidUpdate(_, prevState) {
-    const { query, page, loading } = this.state;
+    const { query, page } = this.state;
+    const isNewQuery = prevState.query !== query;
+    const isNextPage = prevState.query === query && prevState.page !== page;
 
-    if (prevState.query !== query) {
-      this.getFirstImages();
-    }
+    if (isNewQuery || isNextPage) {
+      try {
+        const res = await getImageByQuery(query, page);
 
-    if (prevState.query === query && prevState.page !== page && !loading) {
-      this.getOtherImages();
+        if (isNewQuery) {
+          if (res.hits.length === 0) {
+            throw new Error('Sorry, there are no images matching your search query.')
+          }
+              
+          this.setState({
+            images: res.hits.map(this.buildImageObj),
+            showLoadMore: page < Number(res.totalHits) / 12 
+          })
+              
+          toast.success(`Hooray! We found ${res.totalHits} images!`)
+        }
+        if (isNextPage) {
+          this.setState(prevState => ({
+            images: [...prevState.images, ...res.hits.map(this.buildImageObj)],
+            showLoadMore: page < Number(res.totalHits) / 12 
+          }))
+        }
+      } catch (error) {
+        toast.error(error.message);
+      } finally {
+        this.setState({ loading: false })
+      }
     }
   }
 
   onSearchImage = ({ query }) => {
-    this.setState({ query });
+    this.setState({ query, page: 1, loading: true });
+    window.scrollTo(0, 0);
   }
 
   onLoadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+    this.setState(prevState => ({ page: prevState.page + 1, loading: true }));
   }
 
   render() {
@@ -95,7 +78,7 @@ export default class App extends Component {
         <Searchbar onSubmit={this.onSearchImage} />
         <ImageGallery images={images} />
         {loading && <Loader />}
-        {showLoadMore && <Button onLoadMore={this.onLoadMore} />}
+        {showLoadMore && !loading && <Button onLoadMore={this.onLoadMore} />}
       </div>
     )
   }
